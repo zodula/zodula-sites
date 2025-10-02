@@ -9,6 +9,10 @@
   "devDependencies": {
     "@types/bun": "latest"
   },
+  "scripts": {
+    "start:landing": "cd sites/landing && bun run start",
+    "start:docs": "cd sites/docs && bun run build && bun run preview"
+  },
   "peerDependencies": {
     "typescript": "^5"
   },
