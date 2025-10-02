@@ -240,7 +240,7 @@ const createNodes = (isPortrait: boolean, isCopied: boolean, handleCopy: () => v
                 type: 'command',
                 position: { x: 406, y: -96 },
                 data: {
-                    command: 'bunx nailgun create my-app --branch v0',
+                    command: 'bunx nailgun create my-monorepo --branch v0',
                     isCopied,
                     onCopy: handleCopy,
                     isEditing
@@ -326,7 +326,7 @@ const createNodes = (isPortrait: boolean, isCopied: boolean, handleCopy: () => v
                 type: 'command',
                 position: { x: 534.15, y: 150 },
                 data: {
-                    command: 'bunx nailgun create my-app --branch v0',
+                    command: 'bunx nailgun create my-monorepo --branch v0',
                     isCopied,
                     onCopy: handleCopy
                 }
@@ -662,7 +662,7 @@ export default function HeroSection() {
 
     const handleCopy = () => {
 
-        window.navigator.clipboard.writeText("bunx nailgun create my-app --branch v0");
+        window.navigator.clipboard.writeText("bunx nailgun create my-monorepo --branch v0");
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
     };
