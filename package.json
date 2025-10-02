@@ -11,6 +11,7 @@
   "scripts": {
     "start:landing": "cd sites/landing && bun run start",
     "start:docs": "cd sites/docs && bun run build && bun run start",
+    "start:solutions": "cd sites/solutions && bun run build && bun run start",
     "dev:docs": "cd sites/docs && bun run dev"
   },
   "peerDependencies": {
