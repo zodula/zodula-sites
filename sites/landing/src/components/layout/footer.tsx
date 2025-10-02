@@ -1,5 +1,5 @@
 import React from 'react';
-import { Github } from 'lucide-react';
+import { Github, MessageCircleIcon } from 'lucide-react';
 
 const links = {
     links: [
@@ -8,6 +8,7 @@ const links = {
     ],
     community: [
         { href: 'https://github.com/zodula/zodula', label: 'GitHub', target: '_blank' },
+        { href: 'https://zodula.flarum.cloud/', label: 'Forum', target: '_blank' },
     ],
     legal: [
         { href: 'https://zodula.dev/privacy', label: 'Privacy Policy', target: '_blank' },
@@ -28,13 +29,6 @@ export default function Footer() {
                         <p className="text-muted-foreground mb-6 max-w-md">
                             The fastest way to build full stack apps. Define your data models in TypeScript and get instant APIs, admin UIs, and authentication.
                         </p>
-                        <div className="flex space-x-4">
-                            {[Github].map((Icon, i) => (
-                                <a key={i} href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-white transition-colors">
-                                    <Icon className="w-5 h-5" />
-                                </a>
-                            ))}
-                        </div>
                     </div>
 
                     {[

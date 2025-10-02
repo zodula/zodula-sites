@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Zap } from 'lucide-react';
+import { GithubIcon, Menu, X, Zap } from 'lucide-react';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,14 +17,18 @@ export default function Header() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex space-x-8">
-                        <a href="https://docs.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
-                            Documentation
+                        {/* Forum */}
+                        <a href="https://zodula.flarum.cloud/" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
+                            Forum
                         </a>
                         <a href="https://solutions.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Solutions
                         </a>
-                        <a href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
-                            GitHub
+                        <a href="https://docs.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
+                            Documentation
+                        </a>
+                        <a href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-foreground p-2 text-sm font-medium transition-colors duration-200">
+                            <GithubIcon className="w-4 h-4" />
                         </a>
                     </nav>
 

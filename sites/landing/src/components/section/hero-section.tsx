@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ReactFlow, Background, Controls, MiniMap, Handle, Position, useReactFlow } from '@xyflow/react';
-import type { Node, Edge } from '@xyflow/react';
-import { FileText, Database, Zap, Layers, Monitor, CopyIcon, CopyCheckIcon, CheckIcon } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ReactFlow, Background, Controls, MiniMap, Handle, Position, useReactFlow, applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
+import type { Node, Edge, NodeChange, EdgeChange } from '@xyflow/react';
+import { FileText, Database, Zap, Layers, Monitor, CopyIcon, CopyCheckIcon, CheckIcon, Trash2 } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import '@xyflow/react/dist/style.css';
@@ -17,10 +17,25 @@ const edgeStyle = {
     strokeWidth: 2,
 };
 
+const selectedEdgeStyle = {
+    stroke: '#f97316',
+    strokeWidth: 4,
+};
+
+const hoveredEdgeStyle = {
+    stroke: '#fb923c',
+    strokeWidth: 3,
+};
+
 // Custom Node Components
 const CodeBlockNode = ({ data }: { data: any }) => (
     <div className="bg-black/90 backdrop-blur-xl text-orange-300 p-6 rounded-xl border border-orange-500/30 min-w-[450px] font-mono text-sm shadow-2xl">
-        <Handle type="source" position={Position.Right} id="right" className="w-3 h-3 bg-orange-500" />
+        {/* All-directional handles - always present but only visible when editing */}
+        <Handle type="source" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+
         <div className="flex items-center gap-2 mb-4">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -79,7 +94,12 @@ const CodeBlockNode = ({ data }: { data: any }) => (
 
 const FeatureNode = ({ data }: { data: any }) => (
     <div className="bg-black/80 backdrop-blur-xl border border-orange-500/20 rounded-xl p-4 min-w-[200px] shadow-xl hover:bg-black/90 transition-all duration-300 group">
-        <Handle type="target" position={Position.Left} id="left" className="w-3 h-3 bg-orange-500" />
+        {/* All-directional handles - always present but only visible when editing */}
+        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+
         <div className="flex items-center gap-3 mb-2">
             <div className={`w-8 h-8 ${data.iconBg} rounded-lg flex items-center justify-center text-white`}>
                 {data.icon}
@@ -101,22 +121,113 @@ const TaglineNode = ({ data }: { data: { title: string; subtitle: string; descri
     </div>
 );
 
+const CommandNode = ({ data }: { data: { command: string; isCopied: boolean; onCopy: () => void; isEditing: boolean } }) => (
+    <div className="bg-black/80 backdrop-blur-xl border border-orange-500/20 rounded-lg p-4 flex items-center justify-center relative gap-6 z-30 pointer-events-auto">
+        {/* All-directional handles - always present but only visible when editing */}
+        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+
+        <div className="flex items-center gap-2">
+            <span className="text-white font-mono text-sm"><TypingAnimation speed={50} text={data.command} /></span>
+        </div>
+        <button
+            className="p-3 hover:bg-orange-500/20 rounded-md transition-all duration-200 flex items-center justify-center text-orange-400 hover:text-orange-300 relative z-50 pointer-events-auto border border-orange-500/30 hover:border-orange-500/50"
+            onClick={e => {
+                console.log('Copy button clicked!');
+                e.preventDefault();
+                e.stopPropagation();
+                data.onCopy();
+            }}
+            onMouseDown={e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+            onMouseEnter={e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+            onMouseLeave={e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
+            title="Copy to clipboard"
+            type="button"
+            style={{
+                cursor: 'pointer',
+                pointerEvents: 'auto'
+            }}
+        >
+            {data.isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
+        </button>
+    </div>
+);
+
 const nodeTypes = {
     codeBlock: CodeBlockNode,
     feature: FeatureNode,
     tagline: TaglineNode,
+    command: CommandNode,
+};
+
+// Context Menu Component
+const ContextMenu = ({
+    x,
+    y,
+    onClose,
+    onDeleteEdge,
+    edgeId
+}: {
+    x: number;
+    y: number;
+    onClose: () => void;
+    onDeleteEdge: (edgeId: string) => void;
+    edgeId: string;
+}) => {
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as HTMLElement)) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [onClose]);
+
+    return (
+        <div
+            ref={menuRef}
+            className="fixed bg-black/90 backdrop-blur-xl border border-orange-500/30 rounded-lg p-2 shadow-2xl z-50"
+            style={{ left: x, top: y }}
+        >
+            <button
+                onClick={() => {
+                    onDeleteEdge(edgeId);
+                    onClose();
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/20 rounded text-sm transition-colors w-full text-left"
+            >
+                <Trash2 size={16} />
+                Delete Connection
+            </button>
+        </div>
+    );
 };
 
 // Component to handle resize and fit view
-const FlowResizeHandler = () => {
+const FlowResizeHandler = ({ isPortrait }: { isPortrait: boolean }) => {
     const { fitView } = useReactFlow();
 
     const handleResize = useCallback(() => {
         // Small delay to ensure the resize is complete
         setTimeout(() => {
-            fitView({ padding: 0.3, duration: 300 });
+            fitView({ padding: isPortrait ? 0.1 : 0.3, duration: 300 });
         }, 100);
-    }, [fitView]);
+    }, [fitView, isPortrait]);
 
     useEffect(() => {
         window.addEventListener('resize', handleResize);
@@ -156,159 +267,584 @@ const TypingAnimation = ({ text, speed = 100 }: { text: string; speed?: number }
     );
 };
 
-const initialNodes: Node[] = [
-    {
-        id: 'tagline',
-        type: 'tagline',
-        position: { x: 450, y: 100 },
-        data: {
-            title: 'Build Full Stack Apps',
-            subtitle: '10x Faster',
-            description: 'Less files, more productivity.',
-        },
-    },
-    {
-        id: 'doctype',
-        type: 'codeBlock',
-        position: { x: 200, y: 230 },
-        data: {},
-    },
-    {
-        id: 'openapi',
-        type: 'feature',
-        position: { x: 1000, y: 251 },
-        data: {
-            title: 'OpenAPI Docs',
-            icon: <FileText size={18} />,
-            iconBg: 'bg-gradient-to-r from-blue-500 to-blue-600'
-        },
-    },
-    {
-        id: 'crud',
-        type: 'feature',
-        position: { x: 1000, y: 351 },
-        data: {
-            title: 'CRUD Operations',
-            icon: <Layers size={18} />,
-            iconBg: 'bg-gradient-to-r from-green-500 to-green-600'
-        },
-    },
-    {
-        id: 'triggers',
-        type: 'feature',
-        position: { x: 1000, y: 451 },
-        data: {
-            title: 'Event Triggers',
-            icon: <Zap size={18} />,
-            iconBg: 'bg-gradient-to-r from-yellow-500 to-yellow-600'
-        },
-    },
-    {
-        id: 'database',
-        type: 'feature',
-        position: { x: 1000, y: 551 },
-        data: {
-            title: 'Database Schema',
-            icon: <Database size={18} />,
-            iconBg: 'bg-gradient-to-r from-purple-500 to-purple-600'
-        },
-    },
-    {
-        id: 'ui',
-        type: 'feature',
-        position: { x: 1000, y: 651 },
-        data: {
-            title: 'Admin UI',
-            icon: <Monitor size={18} />,
-            iconBg: 'bg-gradient-to-r from-pink-500 to-pink-600'
-        },
-    },
-];
+// Create nodes based on viewport orientation using utility functions
+const createNodes = (isPortrait: boolean, isCopied: boolean, handleCopy: () => void, isEditing: boolean): Node[] => {
+    if (isPortrait) {
+        // Portrait layout from protrait.dsl
+        return [
+            {
+                id: 'tagline-0',
+                type: 'tagline',
+                position: { x: 416, y: 9.25 },
+                data: {
+                    title: 'Build Full Stack Apps',
+                    subtitle: '10x Faster',
+                    description: 'Less files, more productivity.'
+                }
+            },
+            {
+                id: 'codeBlock-0',
+                type: 'codeBlock',
+                position: { x: 364, y: 162 },
+                data: { isEditing }
+            },
+            {
+                id: 'command-0',
+                type: 'command',
+                position: { x: 406, y: -96 },
+                data: {
+                    command: 'bunx nailgun create my-app --branch v0',
+                    isCopied,
+                    onCopy: handleCopy,
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-0',
+                type: 'feature',
+                position: { x: 346.75, y: 728 },
+                data: {
+                    title: 'OpenAPI Docs',
+                    icon: <FileText size={18} />,
+                    iconBg: 'bg-gradient-to-r from-blue-500 to-blue-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-1',
+                type: 'feature',
+                position: { x: 344, y: 870 },
+                data: {
+                    title: 'CRUD Operations',
+                    icon: <Layers size={18} />,
+                    iconBg: 'bg-gradient-to-r from-green-500 to-green-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-2',
+                type: 'feature',
+                position: { x: 660.25, y: 928 },
+                data: {
+                    title: 'Event Triggers',
+                    icon: <Zap size={18} />,
+                    iconBg: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-3',
+                type: 'feature',
+                position: { x: 344.5, y: 984 },
+                data: {
+                    title: 'Database Schema',
+                    icon: <Database size={18} />,
+                    iconBg: 'bg-gradient-to-r from-purple-500 to-purple-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-4',
+                type: 'feature',
+                position: { x: 670, y: 796 },
+                data: {
+                    title: 'Admin UI',
+                    icon: <Monitor size={18} />,
+                    iconBg: 'bg-gradient-to-r from-pink-500 to-pink-600',
+                    isEditing
+                }
+            }
+        ];
+    } else {
+        // Landscape layout from landscape.dsl
+        return [
+            {
+                id: 'tagline-0',
+                type: 'tagline',
+                position: { x: 450, y: 50 },
+                data: {
+                    title: 'Build Full Stack Apps',
+                    subtitle: '10x Faster',
+                    description: 'Less files, more productivity.'
+                }
+            },
+            {
+                id: 'codeBlock-0',
+                type: 'codeBlock',
+                position: { x: 165.55, y: 250 },
+                data: {}
+            },
+            {
+                id: 'command-0',
+                type: 'command',
+                position: { x: 534.15, y: 150 },
+                data: {
+                    command: 'bunx nailgun create my-app --branch v0',
+                    isCopied,
+                    onCopy: handleCopy
+                }
+            },
+            {
+                id: 'feature-0',
+                type: 'feature',
+                position: { x: 1000, y: 271 },
+                data: {
+                    title: 'OpenAPI Docs',
+                    icon: <FileText size={18} />,
+                    iconBg: 'bg-gradient-to-r from-blue-500 to-blue-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-1',
+                type: 'feature',
+                position: { x: 1001.15, y: 371 },
+                data: {
+                    title: 'CRUD Operations',
+                    icon: <Layers size={18} />,
+                    iconBg: 'bg-gradient-to-r from-green-500 to-green-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-2',
+                type: 'feature',
+                position: { x: 1001.15, y: 471 },
+                data: {
+                    title: 'Event Triggers',
+                    icon: <Zap size={18} />,
+                    iconBg: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-3',
+                type: 'feature',
+                position: { x: 1000, y: 571 },
+                data: {
+                    title: 'Database Schema',
+                    icon: <Database size={18} />,
+                    iconBg: 'bg-gradient-to-r from-purple-500 to-purple-600',
+                    isEditing
+                }
+            },
+            {
+                id: 'feature-4',
+                type: 'feature',
+                position: { x: 1000, y: 671 },
+                data: {
+                    title: 'Admin UI',
+                    icon: <Monitor size={18} />,
+                    iconBg: 'bg-gradient-to-r from-pink-500 to-pink-600',
+                    isEditing
+                }
+            }
+        ];
+    }
+};
 
-const initialEdges: Edge[] = [
-    {
-        id: 'doctype-openapi',
-        source: 'doctype',
-        sourceHandle: 'right',
-        target: 'openapi',
-        targetHandle: 'left',
-        animated: true,
-        style: edgeStyle,
-        labelStyle: labelStyle,
-        type: 'smoothstep',
-    },
-    {
-        id: 'doctype-crud',
-        source: 'doctype',
-        sourceHandle: 'right',
-        target: 'crud',
-        targetHandle: 'left',
-        animated: true,
-        style: edgeStyle,
-        labelStyle: labelStyle,
-        type: 'smoothstep',
-    },
-    {
-        id: 'doctype-triggers',
-        source: 'doctype',
-        sourceHandle: 'right',
-        target: 'triggers',
-        targetHandle: 'left',
-        animated: true,
-        style: edgeStyle,
-        labelStyle: labelStyle,
-        type: 'smoothstep',
-    },
-    {
-        id: 'doctype-database',
-        source: 'doctype',
-        sourceHandle: 'right',
-        target: 'database',
-        targetHandle: 'left',
-        animated: true,
-        style: edgeStyle,
-        labelStyle: labelStyle,
-        type: 'smoothstep',
-    },
-    {
-        id: 'doctype-ui',
-        source: 'doctype',
-        sourceHandle: 'right',
-        target: 'ui',
-        targetHandle: 'left',
-        animated: true,
-        style: edgeStyle,
-        labelStyle: labelStyle,
-        type: 'smoothstep',
-    },
-];
+// Create edges based on viewport orientation using hardcoded connections
+const createEdges = (isPortrait: boolean): Edge[] => {
+    if (isPortrait) {
+        // Portrait connections from protrait.dsl
+        return [
+            {
+                id: 'command-0-feature-0',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-0',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-1',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-1',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-2',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-2',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-3',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-3',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-4',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-4',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-0',
+                source: 'codeBlock-0',
+                sourceHandle: 'bottom',
+                target: 'feature-0',
+                targetHandle: 'right',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-4',
+                source: 'codeBlock-0',
+                sourceHandle: 'bottom',
+                target: 'feature-4',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-1',
+                source: 'codeBlock-0',
+                sourceHandle: 'bottom',
+                target: 'feature-1',
+                targetHandle: 'right',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-2',
+                source: 'codeBlock-0',
+                sourceHandle: 'bottom',
+                target: 'feature-2',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-3',
+                source: 'codeBlock-0',
+                sourceHandle: 'bottom',
+                target: 'feature-3',
+                targetHandle: 'right',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            }
+        ];
+    } else {
+        // Landscape connections from landscape.dsl
+        return [
+            {
+                id: 'command-0-feature-0',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-0',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-1',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-1',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-2',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-2',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-3',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-3',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'command-0-feature-4',
+                source: 'command-0',
+                sourceHandle: 'right',
+                target: 'feature-4',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-0',
+                source: 'codeBlock-0',
+                sourceHandle: 'right',
+                target: 'feature-0',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-1',
+                source: 'codeBlock-0',
+                sourceHandle: 'right',
+                target: 'feature-1',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-2',
+                source: 'codeBlock-0',
+                sourceHandle: 'right',
+                target: 'feature-2',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-3',
+                source: 'codeBlock-0',
+                sourceHandle: 'right',
+                target: 'feature-3',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            },
+            {
+                id: 'codeBlock-0-feature-4',
+                source: 'codeBlock-0',
+                sourceHandle: 'right',
+                target: 'feature-4',
+                targetHandle: 'left',
+                animated: true,
+                style: edgeStyle,
+                labelStyle: labelStyle,
+                type: 'smoothstep',
+            }
+        ];
+    }
+};
+
+// DSL Generation and Parsing
+const generateDsl = (nodes: Node[], edges: Edge[]): string => {
+    const dslLines = ['# Hero Section Layout DSL', ''];
+
+    // Add nodes
+    dslLines.push('# Nodes');
+    nodes.forEach(node => {
+        dslLines.push(`${node.type} ${node.id} at (${node.position.x}, ${node.position.y})`);
+    });
+
+    dslLines.push('');
+    dslLines.push('# Connections');
+    dslLines.push('# Syntax: connect sourceId -> targetId [fromHandle] [toHandle]');
+    dslLines.push('# Example: connect codeBlock-0 -> command-0 bottom left');
+    edges.forEach(edge => {
+        const fromHandle = edge.sourceHandle || 'right';
+        const toHandle = edge.targetHandle || 'left';
+        dslLines.push(`connect ${edge.source} -> ${edge.target} ${fromHandle} ${toHandle}`);
+    });
+
+    dslLines.push('');
+    dslLines.push('# To remove a connection, delete the line above');
+    dslLines.push('# To add a connection, add a new line with: connect sourceId -> targetId [fromHandle] [toHandle]');
+
+    return dslLines.join('\n');
+};
+
 
 export default function HeroSection() {
-    const [nodes] = useState(initialNodes);
-    const [edges] = useState(initialEdges);
-
+    const [isPortrait, setIsPortrait] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [nodes, setNodes] = useState<Node[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
+    const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+    const [isLocalhost, setIsLocalhost] = useState(false);
+
+    const handleCopy = () => {
+
+        window.navigator.clipboard.writeText("bunx nailgun create my-app --branch v0");
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    // Detect localhost and viewport orientation
+    useEffect(() => {
+        const checkLocalhost = () => {
+            setIsLocalhost(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        };
+
+        const checkOrientation = () => {
+            setIsPortrait(window.innerHeight > window.innerWidth);
+        };
+
+        checkLocalhost();
+        checkOrientation();
+        window.addEventListener('resize', checkOrientation);
+        return () => window.removeEventListener('resize', checkOrientation);
+    }, []);
+
+    // Initialize nodes and edges with hardcoded layouts
+    useEffect(() => {
+        const newNodes = createNodes(isPortrait, isCopied, handleCopy, isEditing);
+        const newEdges = createEdges(isPortrait);
+        setNodes(newNodes);
+        setEdges(newEdges);
+    }, [isPortrait, isCopied, isEditing]);
+
+    // Disable editing mode when not on localhost
+    useEffect(() => {
+        if (!isLocalhost && isEditing) {
+            setIsEditing(false);
+        }
+    }, [isLocalhost, isEditing]);
+
+    // Update edge styles when selection changes (without resetting positions)
+    useEffect(() => {
+        if (selectedEdgeId) {
+            setEdges((currentEdges) =>
+                currentEdges.map(edge => ({
+                    ...edge,
+                    style: edge.id === selectedEdgeId ? selectedEdgeStyle : edgeStyle
+                }))
+            );
+        } else {
+            setEdges((currentEdges) =>
+                currentEdges.map(edge => ({
+                    ...edge,
+                    style: edgeStyle
+                }))
+            );
+        }
+    }, [selectedEdgeId]);
+
+    const onNodesChange = useCallback((changes: NodeChange[]) => {
+        console.log('onNodesChange called with:', changes);
+        setNodes((nds) => applyNodeChanges(changes, nds));
+    }, []);
+
+    const onEdgesChange = useCallback((changes: EdgeChange[]) => {
+        setEdges((eds) => applyEdgeChanges(changes, eds));
+    }, []);
+
+    const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+        if (isEditing) {
+            setSelectedEdgeId(edge.id);
+        }
+    }, [isEditing]);
+
+    const handleEdgeContextMenu = useCallback((event: React.MouseEvent, edge: Edge) => {
+        event.preventDefault();
+        if (isEditing) {
+            setSelectedEdgeId(edge.id);
+        }
+    }, [isEditing]);
+
+    const handlePaneClick = useCallback(() => {
+        if (isEditing) {
+            setSelectedEdgeId(null);
+        }
+    }, [isEditing]);
 
     return (
         <section className="relative min-h-[calc(100vh+4px)] flex items-center">
             {/* Background Visualization */}
-            <div className="absolute inset-0 z-10 pt-16">
+            <div className="absolute inset-0 z-10 pt-0">
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
                     nodeTypes={nodeTypes}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
+                    onConnect={(connection) => {
+                        if (isEditing) {
+                            const newEdge = {
+                                id: `${connection.source}-${connection.target}`,
+                                source: connection.source!,
+                                target: connection.target!,
+                                sourceHandle: connection.sourceHandle || 'right',
+                                targetHandle: connection.targetHandle || 'left',
+                                animated: true,
+                                style: edgeStyle,
+                                labelStyle: labelStyle,
+                                type: 'smoothstep',
+                            };
+                            setEdges((eds) => [...eds, newEdge]);
+                        }
+                    }}
+                    onEdgeClick={handleEdgeClick}
+                    onEdgeContextMenu={handleEdgeContextMenu}
+                    onPaneClick={handlePaneClick}
                     fitView
-                    fitViewOptions={{ padding: 0.3 }}
+                    fitViewOptions={{ padding: isPortrait ? 0.1 : 0.3 }}
                     className="bg-transparent"
-                    nodesDraggable={false}
-                    nodesConnectable={false}
-                    elementsSelectable={false}
+                    nodesDraggable={isLocalhost && isEditing}
+                    nodesConnectable={isLocalhost && isEditing}
+                    elementsSelectable={isLocalhost && isEditing}
                     panOnDrag={false}
                     zoomOnScroll={false}
                     panOnScroll={false}
                     selectNodesOnDrag={false}
+                    deleteKeyCode={isLocalhost && isEditing ? 'Delete' : null}
+                    nodesFocusable={false}
+                    edgesFocusable={false}
+                    preventScrolling={false}
+                    zoomOnPinch={false}
+                    zoomOnDoubleClick={false}
                 >
-                    <FlowResizeHandler />
+                    <FlowResizeHandler isPortrait={isPortrait} />
                     <Background
                         color="#1f2937"
                         gap={30}
@@ -316,22 +852,8 @@ export default function HeroSection() {
                     />
                 </ReactFlow>
             </div>
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center w-full h-fit pt-4 gap-4 pt-20">
-                <div className="bg-black/80 backdrop-blur-xl border border-orange-500/20 rounded-lg p-4 mb-4 flex items-center justify-center relative gap-6">
-                    <TypingAnimation text="nailgun create my-app --branch v0" speed={50} />
-                    <button className="cursor-pointer" onClick={() => {
-                        window.navigator.clipboard.writeText("nailgun create my-app --branch v0");
-                        setIsCopied(true);
-                        setTimeout(() => setIsCopied(false), 2000);
-                    }} title="Copy to clipboard">
-                        {isCopied ? <CheckIcon className="w-4 h-4" /> : <CopyIcon className="w-4 h-4" />}
-                    </button>
-                </div>
-            </div>
 
             {/* Hero Content */}
-            <div className="absolute z-20 h-full w-full flex items-center justify-center">
-            </div>
         </section>
     );
 }

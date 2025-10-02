@@ -5,8 +5,8 @@ export default function CtaSection() {
     return (
         <section className="py-20 bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">Ready to Build 10x Faster?</h2>
-                <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                <h2 className="text-3xl md:text-2xl font-bold text-primary mb-2">Ready to Build 10x Faster?</h2>
+                <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
                     Join thousands of developers who are already building amazing backends with Zodula. Get started in minutes, not hours.
                 </p>
                 
