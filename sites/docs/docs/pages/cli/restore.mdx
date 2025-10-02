@@ -1,0 +1,116 @@
+# restore
+
+Restore your Zodula data from a backup file.
+
+## Usage
+
+```bash
+nailgun restore [options]
+```
+
+## Options
+
+- `-f, --file <path>` - Path to the backup file to restore from
+
+## Description
+
+The `restore` command restores your Zodula data from a previously created backup. It can work in interactive mode (showing available backups) or with a specific file path.
+
+## Interactive Mode
+
+If no file path is provided, the command will:
+
+1. Look for the `.zodula_backup` directory
+2. List all available backup files
+3. Let you select which backup to restore
+4. Ask for confirmation before overwriting existing data
+
+## Direct Mode
+
+If you provide a file path with `-f` or `--file`:
+
+```bash
+nailgun restore --file /path/to/backup.zip
+```
+
+## What It Does
+
+1. Lists available backups (in interactive mode)
+2. Asks for confirmation before overwriting existing data
+3. Removes existing `.zodula_data` directory if it exists
+4. Extracts the backup file
+5. Verifies the restoration was successful
+6. Runs migrations to ensure database consistency
+
+## Example
+
+### Interactive Mode
+
+```bash
+$ nailgun restore
+
+📋 Found 3 backup(s):
+  1. zodula-backup-2023-12-21T10-30-45-123Z.zip (15.23 MB, 2023-12-21)
+  2. zodula-backup-2023-12-20T15-20-30-456Z.zip (12.45 MB, 2023-12-20)
+  3. zodula-backup-2023-12-19T09-15-20-789Z.zip (11.87 MB, 2023-12-19)
+
+? Select a backup to restore: zodula-backup-2023-12-21T10-30-45-123Z.zip
+? Are you sure you want to restore from /path/to/backup.zip? Yes
+
+🔄 Restoring backup...
+📦 Extracting backup...
+✅ Backup restored successfully!
+📁 Restored to: /path/to/.zodula_data
+📊 Directory size: 15.23 MB
+```
+
+### Direct Mode
+
+```bash
+$ nailgun restore --file /path/to/backup.zip
+
+📁 Using backup file: /path/to/backup.zip
+? Are you sure you want to restore from /path/to/backup.zip? Yes
+
+🔄 Restoring backup...
+📦 Extracting backup...
+✅ Backup restored successfully!
+```
+
+## Important Warnings
+
+⚠️ **Data Loss Warning**: Restoring a backup will completely replace your current `.zodula_data` directory. All existing data will be lost.
+
+## When to Use
+
+Use `restore` when:
+
+- You need to recover from a backup
+- You want to revert to a previous state
+- You're setting up a development environment from a backup
+- You need to restore after data corruption
+
+## Safety Features
+
+- **Confirmation Required**: Always asks for confirmation before overwriting
+- **Backup Verification**: Verifies the backup was extracted successfully
+- **Migration Application**: Automatically runs migrations after restoration
+- **Error Handling**: Provides clear error messages if restoration fails
+
+## Tips
+
+- Always create a backup before restoring
+- Test restorations in a development environment first
+- Keep multiple backup versions
+- Verify the backup file is not corrupted
+- Ensure you have enough disk space for restoration
+
+## Troubleshooting
+
+If restoration fails:
+
+1. Check that the backup file exists and is accessible
+2. Ensure you have write permissions
+3. Verify the backup file is not corrupted
+4. Check available disk space
+5. Try extracting the backup manually to test it

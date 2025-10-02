@@ -1,0 +1,26 @@
+{
+  "name": "landing",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --hot index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "@xyflow/react": "^12.8.5",
+    "bun-plugin-tailwind": "^0.0.15",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
+    "lucide-react": "^0.263.1",
+    "react-syntax-highlighter": "^15.5.0",
+    "tailwind": "^4.0.0",
+    "tailwindcss": "^4.1.14"
+  }
+}

@@ -1,0 +1,82 @@
+# build
+
+Build the project for production deployment.
+
+## Usage
+
+```bash
+nailgun build
+```
+
+## Description
+
+The `build` command compiles and prepares your Zodula project for production deployment. It runs build scripts for all apps in your project.
+
+## What It Does
+
+1. Starts up the Zodula server
+2. Loads all apps in the project
+3. Runs build scripts for each app
+4. Compiles TypeScript and other assets
+5. Prepares production-ready files
+
+## Build Process
+
+For each app, the build process:
+
+1. Looks for a build script at `scripts/build`
+2. Imports and runs the build script if found
+3. Compiles TypeScript files
+4. Bundles assets and dependencies
+5. Optimizes for production
+
+## App Build Scripts
+
+Each app can have its own build script at `apps/your-app/scripts/build.ts`:
+
+```typescript
+export default async function build() {
+    // Your custom build logic here
+    console.log('Building app...');
+    
+    // Example: Compile TypeScript
+    // Example: Bundle assets
+    // Example: Optimize for production
+}
+```
+
+## When to Use
+
+Run `build` when:
+
+- Preparing for production deployment
+- Creating production builds
+- Before deploying to servers
+- When you need optimized assets
+- As part of CI/CD pipelines
+
+## Example
+
+```bash
+$ nailgun build
+
+✓ Starting build process...
+✓ Building app: my-app
+✓ Building app: another-app
+✓ Build completed successfully
+```
+
+## Production Considerations
+
+- Build outputs are optimized for production
+- Assets are minified and compressed
+- TypeScript is compiled to JavaScript
+- Dependencies are bundled efficiently
+
+## Tips
+
+- Run `build` before deploying to production
+- Test your build locally before deployment
+- Use build outputs for production servers
+- Keep build scripts simple and focused
+- Consider using CI/CD for automated builds

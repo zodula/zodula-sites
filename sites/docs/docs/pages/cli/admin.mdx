@@ -1,0 +1,109 @@
+# admin
+
+Access administrative functions and system management.
+
+## Usage
+
+```bash
+nailgun admin <subcommand> [options]
+```
+
+## Subcommands
+
+### create-user
+
+Create a new user in the system.
+
+```bash
+nailgun admin create-user [options]
+```
+
+#### Options
+
+- `-e, --email <email>` - Enter the email of the user (required)
+- `-p, --password <password>` - Enter the password of the user (required)
+- `-r, --roles <roles>` - Enter the roles of the user (required, comma-separated)
+
+#### Example
+
+```bash
+nailgun admin create-user --email admin@example.com --password secret123 --roles "Administrator,User"
+```
+
+## Description
+
+The `admin` command provides access to administrative functions and system management tools for your Zodula project. It includes subcommands for user management and other administrative tasks.
+
+## What It Does
+
+### create-user
+
+The `create-user` subcommand:
+
+1. Starts up the Zodula server
+2. Validates that the user doesn't already exist
+3. Hashes the provided password
+4. Creates a new user with the specified email and password
+5. Assigns the specified roles to the user
+6. Sets the user as active
+
+## User Creation Process
+
+```bash
+$ nailgun admin create-user --email admin@example.com --password secret123 --roles "Administrator,User"
+
+✓ User created successfully
+✓ Email: admin@example.com
+✓ Roles: Administrator, User
+✓ Status: Active
+```
+
+## Roles
+
+Roles are specified as a comma-separated list:
+
+```bash
+--roles "Administrator,User,Manager"
+```
+
+## When to Use
+
+Use the `admin` command when you need to:
+
+- Create system administrators
+- Set up initial users
+- Manage user accounts
+- Perform administrative tasks
+
+## Important Notes
+
+- User emails must be unique
+- Passwords are automatically hashed
+- Users are created as active by default
+- Roles are assigned during user creation
+- The command will exit after completion
+
+## Security Considerations
+
+- Use strong passwords for administrative accounts
+- Limit administrative access to trusted users
+- Regularly review user roles and permissions
+- Keep administrative accounts secure
+
+## Tips
+
+- Create your first administrator user after initial setup
+- Use descriptive role names
+- Test user creation in development first
+- Keep track of administrative users
+- Use secure passwords for all accounts
+
+## Troubleshooting
+
+If user creation fails:
+
+1. Check that the email is unique
+2. Verify the email format is valid
+3. Ensure roles are properly formatted
+4. Check that the server is running
+5. Verify database connectivity

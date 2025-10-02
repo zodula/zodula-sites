@@ -1,0 +1,436 @@
+# API Reference
+
+Zodula automatically generates a complete REST API for all your DocTypes. This reference covers the standard endpoints and patterns based on the actual API structure.
+
+## Base URL
+
+Zodula provides several API endpoint patterns:
+
+- **Resources**: `/api/resources/{DocType}` - CRUD operations for DocTypes
+- **Actions**: `/api/action/{action_name}` - Server-side actions and utilities
+- **Admin**: `/admin/doctypes/{doctype}` - Admin interface endpoints
+
+## Authentication
+
+Zodula includes built-in authentication with session-based authentication:
+
+```http
+Authorization: Bearer {session_token}
+```
+
+### Login
+```http
+POST /api/action/zodula.auth.login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password"
+}
+```
+
+### Logout
+```http
+POST /api/action/zodula.auth.logout
+```
+
+### Get Current User
+```http
+GET /api/action/zodula.auth.me
+```
+
+## Standard Endpoints
+
+### List Records
+
+Get a paginated list of records from a DocType.
+
+```http
+GET /api/resources/zodula__User
+```
+
+**Query Parameters:**
+- `limit` (number) - Number of records per page (default: 20)
+- `page` (number) - Page number (default: 1)
+- `sort` (string) - Field to sort by
+- `order` (string) - Sort order: `asc` or `desc`
+- `filters` (array) - Filter conditions as tuples `[field, operator, value]`
+
+**Example:**
+```http
+GET /api/resources/zodula__User?limit=10&page=1&sort=name&order=asc
+```
+
+**Response:**
+```json
+{
+  "count": 100,
+  "page": 1,
+  "limit": 10,
+  "docs": [
+    {
+      "name": "USER-001",
+      "email": "john@example.com",
+      "name": "John Doe",
+      "is_active": 1,
+      "creation": "2024-01-01 10:00:00",
+      "modified": "2024-01-01 10:00:00"
+    }
+  ]
+}
+```
+
+### Get Single Record
+
+Retrieve a specific record by its ID.
+
+```http
+GET /api/resources/zodula__User/{id}
+```
+
+**Example:**
+```http
+GET /api/resources/zodula__User/USER-001
+```
+
+**Response:**
+```json
+{
+  "name": "USER-001",
+  "email": "john@example.com",
+  "name": "John Doe",
+  "is_active": 1,
+  "creation": "2024-01-01 10:00:00",
+  "modified": "2024-01-01 10:00:00"
+}
+```
+
+### Create Record
+
+Create a new record.
+
+```http
+POST /api/resources/zodula__User
+Content-Type: application/json
+```
+
+**Example:**
+```http
+POST /api/resources/zodula__User
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "name": "Jane Smith",
+  "password": "secret123"
+}
+```
+
+**Response:**
+```json
+{
+  "name": "USER-002",
+  "email": "jane@example.com",
+  "name": "Jane Smith",
+  "is_active": 1,
+  "creation": "2024-01-01 11:00:00",
+  "modified": "2024-01-01 11:00:00"
+}
+```
+
+### Update Record
+
+Update an existing record.
+
+```http
+PUT /api/resources/zodula__User/{id}
+Content-Type: application/json
+```
+
+**Example:**
+```http
+PUT /api/resources/zodula__User/USER-002
+Content-Type: application/json
+
+{
+  "name": "Jane Updated"
+}
+```
+
+**Response:**
+```json
+{
+  "name": "USER-002",
+  "email": "jane@example.com",
+  "name": "Jane Updated",
+  "is_active": 1,
+  "creation": "2024-01-01 11:00:00",
+  "modified": "2024-01-01 12:00:00"
+}
+```
+
+### Delete Record
+
+Delete a record.
+
+```http
+DELETE /api/resources/zodula__User/{id}
+```
+
+**Example:**
+```http
+DELETE /api/resources/zodula__User/USER-002
+```
+
+**Response:**
+```json
+{
+  "message": "Record deleted successfully"
+}
+```
+
+## Action Endpoints
+
+Zodula provides server-side action endpoints for various operations:
+
+### Search Actions
+
+#### Document Search
+```http
+POST /api/action/zodula.search.docSearch
+Content-Type: application/json
+
+{
+  "docid": "zodula__User",
+  "query": "search term",
+  "limit": 10,
+  "filters": [["is_active", "=", 1]]
+}
+```
+
+#### Global Search
+```http
+POST /api/action/zodula.search.search
+Content-Type: application/json
+
+{
+  "query": "search term",
+  "limit": 10
+}
+```
+
+### Document Actions
+
+#### Cancel Document
+```http
+POST /api/action/zodula.doc.cancel
+Content-Type: application/json
+
+{
+  "doctype": "zodula__User",
+  "name": "USER-001"
+}
+```
+
+#### Rename Document
+```http
+POST /api/action/zodula.doc.rename
+Content-Type: application/json
+
+{
+  "doctype": "zodula__User",
+  "name": "USER-001",
+  "new_name": "USER-001-NEW"
+}
+```
+
+#### Submit Document
+```http
+POST /api/action/zodula.doc.submit
+Content-Type: application/json
+
+{
+  "doctype": "zodula__User",
+  "name": "USER-001"
+}
+```
+
+### Utility Actions
+
+#### Count Records
+```http
+POST /api/action/zodula.core.count
+Content-Type: application/json
+
+{
+  "doctype": "zodula__User",
+  "filters": [["is_active", "=", 1]]
+}
+```
+
+#### Export Data
+```http
+POST /api/action/zodula.exports.csv
+Content-Type: application/json
+
+{
+  "doctype": "zodula__User",
+  "fields": ["name", "email"],
+  "filters": [["is_active", "=", 1]]
+}
+```
+
+#### Fixtures Export
+```http
+POST /api/action/zodula.fixtures.exports
+Content-Type: application/json
+
+{
+  "app": "zodula",
+  "doctype": "zodula__User",
+  "ids": ["USER-001", "USER-002"],
+  "fields": ["name", "email"]
+}
+```
+
+## Advanced Filtering
+
+Use the `filters` parameter for complex queries. Filters are arrays of tuples with format `[field, operator, value]`:
+
+```http
+GET /api/resources/zodula__User?filters=[["email", "=", "john@example.com"], ["name", "like", "%John%"]]
+```
+
+**Supported Operators:**
+- `=` - Equals
+- `!=` - Not equals
+- `>` - Greater than
+- `>=` - Greater than or equal
+- `<` - Less than
+- `<=` - Less than or equal
+- `like` - Pattern matching (use `%` for wildcards)
+- `not like` - Not pattern matching
+- `in` - Value in list
+- `not in` - Value not in list
+- `is null` - Field is null
+- `is not null` - Field is not null
+
+**Examples:**
+```http
+# Multiple conditions
+GET /api/resources/zodula__User?filters=[["email", "=", "john@example.com"], ["is_active", "=", 1]]
+
+# Pattern matching
+GET /api/resources/zodula__User?filters=[["name", "like", "%John%"]]
+
+# Range queries
+GET /api/resources/zodula__User?filters=[["creation", ">=", "2024-01-01"], ["creation", "<=", "2024-12-31"]]
+
+# Null checks
+GET /api/resources/zodula__User?filters=[["last_login", "is null"]]
+```
+
+## Admin Endpoints
+
+Zodula provides admin interface endpoints for managing DocTypes:
+
+### Get DocType Info
+```http
+GET /admin/doctypes/{doctype}
+```
+
+### Get DocType List
+```http
+GET /admin/doctypes/{doctype}/list
+```
+
+### Get DocType Form
+```http
+GET /admin/doctypes/{doctype}/form
+```
+
+### Get DocType Form for Specific Record
+```http
+GET /admin/doctypes/{doctype}/form/{id}
+```
+
+## Bulk Operations
+
+### Bulk Insert
+
+```http
+POST /api/resources/zodula__User/bulk
+Content-Type: application/json
+
+[
+  {
+    "email": "user1@example.com",
+    "name": "User 1"
+  },
+  {
+    "email": "user2@example.com", 
+    "name": "User 2"
+  }
+]
+```
+
+### Bulk Update
+
+```http
+PUT /api/resources/zodula__User/bulk
+Content-Type: application/json
+
+[
+  {
+    "name": "USER-001",
+    "name": "Updated Name 1"
+  },
+  {
+    "name": "USER-002",
+    "name": "Updated Name 2"
+  }
+]
+```
+
+## Error Responses
+
+All endpoints return consistent error responses:
+
+```json
+{
+  "error": {
+    "type": "ValidationError",
+    "message": "Field 'email' is required",
+    "field": "email"
+  }
+}
+```
+
+**Common Error Types:**
+- `ValidationError` - Field validation failed
+- `NotFoundError` - Record not found
+- `PermissionError` - Insufficient permissions
+- `DuplicateError` - Duplicate record exists
+
+## OpenAPI Documentation
+
+Zodula automatically generates comprehensive OpenAPI documentation:
+
+- **JSON Schema**: `GET /openapi.json` - Complete OpenAPI 3.0 specification
+- **Interactive UI**: `GET /openapi` - Swagger UI interface
+
+The OpenAPI spec includes:
+- All DocType resource endpoints (`/api/resources/{DocType}`)
+- All action endpoints (`/api/action/{action_name}`)
+- Admin interface endpoints (`/admin/doctypes/{doctype}`)
+- Request/response schemas with Zod validation
+- Authentication requirements
+- Example requests and responses
+- Field validation rules and constraints
+
+## Next Steps
+
+- Learn about [Authentication](/authentication) in detail
+- Explore [Permissions](/permissions) for access control
+- Check out [SDK Usage](/sdk-usage) for programmatic access
+- See [Examples](/examples) for common patterns

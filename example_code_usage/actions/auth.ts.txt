@@ -1,0 +1,141 @@
+import { z } from "bxo"
+
+export const login = $action(async ctx => {
+    const { email, password } = ctx.body
+    if (!email || !password) {
+        throw new Error("Email and password are required")
+    }
+    const { docs: users } = await $zodula.doctype("zodula__User").select().where("email", "=", email).where("is_active", "=", 1).unsafe(true).bypass(true)
+    if (!users[0]) {
+        throw new Error("User not found")
+    }
+    const user = users[0]
+    const isPasswordValid = await Bun.password.verify(password, user.password as string)
+    if (!isPasswordValid) {
+        throw new Error("Invalid password")
+    }
+    const { docs: [existingSession] } = await $zodula.doctype("zodula__Session").select().where("user", "=", user.id).sort("expires_at", "desc").bypass(true)
+    // validate if session is already exists and not expired
+    if (!existingSession) {
+        // create new session
+        const createdSession = await $zodula.doctype("zodula__Session").insert({
+            user: user.id,
+            expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
+        }).bypass(true)
+        // session id cookie
+        ctx.set.cookie("zodula_sid", createdSession.id, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        // user id cookie
+        ctx.set.cookie("zodula_user_id", user.id, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        // email cookie
+        ctx.set.cookie("zodula_email", user.email, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        // roles cookie
+        ctx.set.cookie("zodula_roles", user.roles?.map((role: any) => role.role).join(",") || "", {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        return ctx.json({
+            session: createdSession,
+            user: $zodula.utils.safe("zodula__User", user)
+        })
+    } else {
+        const updatedSession = await $zodula.doctype("zodula__Session").update(existingSession.id, {
+            expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
+        }).bypass(true)
+        ctx.set.cookie("zodula_sid", updatedSession.id, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        ctx.set.cookie("zodula_user_id", user.id, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        // email cookie
+        ctx.set.cookie("zodula_email", user.email, {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        // roles cookie
+        ctx.set.cookie("zodula_roles", user.roles?.map((role: any) => role.role).join(",") || "", {
+            path: "/",
+            maxAge: 30 * 24 * 60 * 60 // 30 days
+        })
+        return ctx.json({
+            session: updatedSession,
+            user: $zodula.utils.safe("zodula__User", user)
+        })
+    }
+}, {
+    body: z.object({
+        email: z.string().email(),
+        password: z.string()
+    }),
+    response: {
+        200: z.object({
+            session: $zodula.utils.zod("zodula__Session"),
+            user: $zodula.utils.zod("zodula__User")
+        })
+    }
+})
+
+export const me = $action(async ctx => {
+    const user = await $zodula.session.user()
+    return ctx.json({
+        user: $zodula.utils.safe("zodula__User", user)
+    })
+}, {
+    response: {
+        200: z.object({
+            user: $zodula.utils.zod("zodula__User")
+        })
+    }
+})
+
+export const logout = $action(async ctx => {
+    ctx.set.cookie("zodula_sid", "", {
+        path: "/",
+        maxAge: 0
+    })
+    ctx.set.cookie("zodula_user_id", "", {
+        path: "/",
+        maxAge: 0
+    })
+    ctx.set.cookie("zodula_email", "", {
+        path: "/",
+        maxAge: 0
+    })
+    ctx.set.cookie("zodula_roles", "", {
+        path: "/",
+        maxAge: 0
+    })
+    return ctx.json({
+        message: "Logged out successfully"
+    })
+}, {
+    response: {
+        200: z.object({
+            message: z.string()
+        })
+    }
+})
+
+export const roles = $action(async ctx => {
+    const roles = await $zodula.session.roles()
+    return ctx.json({
+        roles
+    })
+}, {
+    response: {
+        200: z.object({
+            roles: z.array(z.string())
+        })
+    }
+})

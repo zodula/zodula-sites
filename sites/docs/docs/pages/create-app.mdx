@@ -1,0 +1,156 @@
+# Create App
+
+The `scaffold` command is the fastest way to create new apps, doctypes, and actions in your Zodula project. It provides an interactive CLI that guides you through the setup process.
+
+## Quick Start
+
+```bash
+nailgun scaffold
+```
+
+This will prompt you to choose what you'd like to scaffold:
+- **App** - Create a new application
+- **Doctype** - Create a new document type
+- **Action** - Create a new API action
+
+## Scaffold App
+
+Create a new application with the following command:
+
+```bash
+nailgun scaffold app
+```
+
+Or simply run `nailgun scaffold` and select "App" from the menu.
+
+### Interactive Setup
+
+The scaffold command will prompt you for:
+
+1. **App name** - Must start with lowercase letter and contain only lowercase letters, numbers, hyphens, and underscores
+2. **App description** - Optional description of your application
+
+### Generated Structure
+
+When you scaffold an app, the following structure is created:
+
+```
+apps/your-app-name/
+├── package.json
+├── index.ts
+├── src/
+│   └── server/
+│       └── index.ts
+├── doctype/
+│   └── core/
+├── actions/
+├── migrations/
+└── fixtures/
+```
+
+### Example
+
+```bash
+$ nailgun scaffold app
+
+? App name: my-awesome-app
+? App description: A sample application
+
+✓ App my-awesome-app created successfully!
+Next steps:
+1. cd apps/my-awesome-app
+2. Run 'nailgun prepare' to generate types
+3. Run 'nailgun dev' to start development
+```
+
+## Scaffold Doctype
+
+Create a new document type within an existing app:
+
+```bash
+nailgun scaffold doctype
+```
+
+### Interactive Setup
+
+The scaffold command will prompt you for:
+
+1. **Select app** - Choose from existing apps
+2. **Doctype name** - Must start with uppercase letter (e.g., Customer, Product)
+3. **Domain** - Folder name (default: "core")
+4. **Label** - Display name (defaults to doctype name)
+5. **Is submittable** - Whether this doctype can be submitted
+
+### Generated Doctype
+
+The scaffold creates a basic doctype with a `name` field:
+
+```typescript
+export default $doctype<"app__DoctypeName">({
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    // Add more fields as needed
+}, {
+    label: "Doctype Name",
+    is_submittable: 0,
+    search_fields: "name"
+})
+```
+
+## Scaffold Action
+
+Create a new API action within an existing app:
+
+```bash
+nailgun scaffold action
+```
+
+### Interactive Setup
+
+The scaffold command will prompt you for:
+
+1. **Select app** - Choose from existing apps
+2. **Action name** - Must start with lowercase letter (e.g., create_user, get_products)
+3. **Module name** - Grouping for actions (default: "core")
+
+### Generated Action
+
+The scaffold creates a basic action with request/response schemas:
+
+```typescript
+import { z } from "bxo";
+
+export const action_name = $action(async ctx => {
+    // TODO: Implement action_name logic
+    return ctx.json({
+        message: "action_name action executed"
+    });
+}, {
+    // TODO: Add request/response schemas
+    response: {
+        200: z.object({
+            message: z.string()
+        })
+    }
+});
+```
+
+## Next Steps
+
+After scaffolding:
+
+1. **For Apps**: Navigate to your app directory and run `nailgun prepare` to generate types
+2. **For Doctypes**: Add fields to your doctype and run `nailgun generate` to create migrations
+3. **For Actions**: Implement your action logic and test via API
+
+## Tips
+
+- Use descriptive names for your apps, doctypes, and actions
+- Follow the naming conventions (lowercase for apps/actions, PascalCase for doctypes)
+- Start with simple structures and add complexity as needed
+- Use the generated code as a starting point and customize as required

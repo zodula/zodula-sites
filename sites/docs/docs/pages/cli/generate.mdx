@@ -1,0 +1,117 @@
+# generate
+
+Generate database migrations based on your doctype changes.
+
+## Usage
+
+```bash
+nailgun generate [options]
+```
+
+## Options
+
+- `-b, --blank` - Generate a blank migration file
+
+## Description
+
+The `generate` command analyzes your doctype definitions and generates the necessary database migrations to implement the changes. It compares your current doctypes with the database schema and creates migration files.
+
+## What It Does
+
+1. Analyzes doctype definitions
+2. Compares with current database schema
+3. Generates migration files for changes
+4. Handles destructive operations with user confirmation
+5. Creates timestamped migration files
+
+## Examples
+
+### Generate Migrations
+
+```bash
+nailgun generate
+```
+
+This will:
+- Analyze your doctypes
+- Compare with database schema
+- Generate migration files for any changes
+- Ask for confirmation on destructive operations
+
+### Generate Blank Migration
+
+```bash
+nailgun generate --blank
+```
+
+This will:
+- Prompt you to select an app
+- Create a blank migration file
+- Allow you to write custom migration logic
+
+## Migration Files
+
+Generated migrations are created in the `migrations/` directory of each app with timestamps:
+
+```
+apps/your-app/migrations/
+├── 1703123456789_your_app_doctype_changes.ts
+├── 1703123456790_your_app_another_change.ts
+└── ...
+```
+
+## Blank Migration Template
+
+When using `--blank`, a template is created:
+
+```typescript
+export default $migration(async ({sql}) => {
+    // Your custom migration logic here
+})
+```
+
+## When to Use
+
+Run `generate` when:
+
+- You've modified doctype definitions
+- You've added new doctypes
+- You've changed field types or properties
+- You need to create custom migrations
+- Before running `nailgun migrate`
+
+## Example Output
+
+```bash
+$ nailgun generate
+
+✓ Analyzing doctypes...
+✓ Comparing schemas...
+✓ Generated 2 migrations
+✓ Migration files created:
+  - apps/my-app/migrations/1703123456789_my_app_user_changes.ts
+  - apps/my-app/migrations/1703123456790_my_app_product_changes.ts
+```
+
+## Important Notes
+
+- Always review generated migrations before applying
+- Test migrations in development first
+- Some operations may be destructive
+- Generated migrations are timestamped to ensure proper ordering
+
+## Next Steps
+
+After generating migrations:
+
+1. Review the generated migration files
+2. Make any necessary modifications
+3. Run `nailgun migrate` to apply the changes
+4. Test your application
+
+## Tips
+
+- Use `--blank` for custom migration logic
+- Review migrations before applying in production
+- Keep migration files in version control
+- Test migrations in development environment first

@@ -1,0 +1,338 @@
+# DocTypes
+
+DocTypes are the core building blocks of Zodula applications. They define your data models with full TypeScript support and automatic API generation.
+
+## What are DocTypes?
+
+DocTypes are schema definitions that describe your data models. They provide:
+
+- **Type-safe data models** with automatic TypeScript generation
+- **Automatic REST API** endpoints for CRUD operations
+- **Database migrations** with schema diffing
+- **Admin interface** generation
+- **Validation** using Zod schemas
+
+## Creating a DocType
+
+DocTypes are defined in TypeScript files in your app's `doctype/` directory. Each DocType is exported as a default export using the `$doctype` function.
+
+### Basic DocType Definition
+
+```typescript
+export default $doctype<"zodula__User">({
+    name: {
+        type: "Text",
+        in_list_view: 1
+    },
+    email: {
+        type: "Email",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    password: {
+        type: "Password",
+        required: 1,
+        no_copy: 1
+    },
+    is_active: {
+        type: "Check",
+        default: "1",
+        in_list_view: 1
+    }
+}, {
+    label: "User",
+    search_fields: "email\nname\nid"
+})
+```
+
+### Simple DocType
+
+```typescript
+export default $doctype({
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1,
+        unique: 1
+    },
+    description: {
+        type: "Text",
+        label: "Description"
+    },
+    version: {
+        type: "Text",
+        label: "Version",
+        required: 1
+    }
+}, {
+    label: "App",
+    is_system_generated: 1,
+    naming_series: "{{name}}"
+});
+```
+
+## Field Types
+
+Zodula supports various field types for different data needs. See the [Field Types](/field-types) documentation for a complete reference of all available field types and their configuration options.
+
+### DocType with References
+
+```typescript
+export default $doctype({
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1
+    },
+    href: {
+        type: "Text",
+        label: "Href",
+        required: 1
+    }
+}, {
+    label: "Page",
+    display_field: "name",
+    search_fields: "name\nhref"
+})
+```
+
+## DocType Configuration
+
+DocTypes support various configuration options:
+
+### Basic Configuration
+
+```typescript
+export default $doctype({
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1
+    },
+    href: {
+        type: "Text",
+        label: "Href",
+        required: 1
+    }
+}, {
+    label: "Page",
+    display_field: "name",
+    search_fields: "name\nhref"
+})
+```
+
+### Advanced Configuration
+
+```typescript
+export default $doctype({
+    app: {
+        type: "Text",
+        label: "App",
+        required: 1,
+        unique: 1,
+        group: "group1"
+    },
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1,
+        unique: 1,
+        group: "group1"
+    },
+    label: {
+        type: "Text",
+        label: "Label"
+    },
+    json_model: {
+        type: "JSON",
+        label: "JSON Model"
+    },
+    is_single: {
+        type: "Check",
+        label: "Is Single"
+    },
+    naming_series: {
+        type: "Text",
+        label: "Naming Series"
+    },
+    is_submittable: {
+        type: "Check",
+        label: "Is Submittable"
+    },
+    track_changes: {
+        type: "Check",
+        label: "Track Changes"
+    },
+    display_field: {
+        type: "Text",
+        label: "Display Field"
+    },
+    search_fields: {
+        type: "Text",
+        label: "Search Fields"
+    },
+    is_system_generated: {
+        type: "Check",
+        label: "Is System Generated"
+    }
+}, {
+    label: "Doctype",
+    is_system_generated: 1,
+    display_field: "label",
+    search_fields: "app\nname"
+})
+```
+
+## DocType Hooks
+
+DocTypes support lifecycle hooks for custom logic:
+
+```typescript
+export default $doctype<"zodula__User">({
+    name: {
+        type: "Text",
+        in_list_view: 1
+    },
+    email: {
+        type: "Email",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    password: {
+        type: "Password",
+        required: 1,
+        no_copy: 1
+    },
+    is_active: {
+        type: "Check",
+        default: "1",
+        in_list_view: 1
+    }
+}, {
+    label: "User",
+    search_fields: "email\nname\nid"
+})
+.on("before_change", async ({ doc, old }) => {
+    doc.password = await Bun.password.hash(doc.password as string);
+})
+.on("after_cancel", () => { 
+    // Custom logic after cancel
+})
+```
+
+## Automatic API Generation
+
+Once you define a DocType, Zodula automatically generates REST endpoints:
+
+### List Records
+```http
+GET /api/resources/zodula__User?limit=10&page=1&sort=name&order=asc
+```
+
+Response:
+```json
+{
+  "count": 100,
+  "page": 1,
+  "limit": 10,
+  "docs": [
+    {
+      "name": "USER-001",
+      "email": "john@example.com",
+      "name": "John Doe",
+      "is_active": 1
+    }
+  ]
+}
+```
+
+### Get Single Record
+```http
+GET /api/resources/zodula__User/USER-001
+```
+
+### Create Record
+```http
+POST /api/resources/zodula__User
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "name": "Jane Smith",
+  "password": "secret123"
+}
+```
+
+### Update Record
+```http
+PUT /api/resources/zodula__User/USER-001
+Content-Type: application/json
+
+{
+  "name": "Jane Updated"
+}
+```
+
+### Delete Record
+```http
+DELETE /api/resources/zodula__User/USER-001
+```
+
+## Programmatic SDK
+
+Use the server-side SDK for type-safe operations:
+
+```typescript
+// Select records
+const result = await $zodula
+  .doctype("zodula__User")
+  .select()
+  .where("email", "=", "me@example.com")
+  .limit(10)
+  .page(1);
+
+// Insert record
+const user = await $zodula
+  .doctype("zodula__User")
+  .insert({ 
+    email: "me@example.com", 
+    password: "secret",
+    name: "John Doe"
+  });
+
+// Update record
+await $zodula
+  .doctype("zodula__User")
+  .update("USER-001", { name: "John Updated" });
+
+// Delete record
+await $zodula
+  .doctype("zodula__User")
+  .delete("USER-001");
+
+// Get single record
+const user = await $zodula
+  .doctype("zodula__User")
+  .get("USER-001");
+```
+
+## Migrations
+
+When you modify DocTypes, generate and apply migrations:
+
+```bash
+# Generate migrations (diff DocTypes vs DB)
+nailgun generate
+
+# Apply migrations
+nailgun migrate
+```
+
+## Next Steps
+
+- Learn about [Field Types](/field-types) in detail
+- Explore [Relationships](/relationships) between DocTypes
+- Check out [Permissions](/permissions) for access control
+- See [Examples](/examples) for common patterns
