@@ -48,7 +48,7 @@ export function App() {
             </span>
           </div>
           <div className="flex flex-col items-center justify-center gap-4">
-            <Button variant="secondary" onClick={() => window.open("mailto:solution@zodula.dev", "_blank")}>
+            <Button variant="secondary" onClick={() => window.open("mailto:solutions@zodula.dev", "_blank")}>
               <MailIcon />
               <span>Contact Us</span>
             </Button>
@@ -60,8 +60,8 @@ export function App() {
           <span>© {new Date().getFullYear()} Zodula. All rights reserved.</span>
         </div>
         <div className="flex justify-center gap-2 text-sm font-mono">
-          <a href="mailto:solution@zodula.dev" target="_blank" className="hover:underline">
-            solution@zodula.dev
+          <a href="mailto:solutions@zodula.dev" target="_blank" className="hover:underline">
+            solutions@zodula.dev
           </a>
         </div>
       </div>
