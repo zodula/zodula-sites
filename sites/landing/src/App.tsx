@@ -7,7 +7,7 @@ import Footer from './components/layout/footer';
 
 export default function App() {
     return (
-        <div className="min-h-screen bg-background max-md:px-4">
+        <div className="min-h-screen bg-background max-md:px-4 max-md:pt-10">
             <Header />
             <HeroSection />
             <CodeExamplesSection />

@@ -801,7 +801,7 @@ export default function HeroSection() {
     return (
         <section className="relative min-h-[calc(100vh+4px)] flex items-center">
             {/* Background Visualization */}
-            <div className="absolute inset-0 z-10 pt-0">
+            <div className={`absolute inset-0 z-10`}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
