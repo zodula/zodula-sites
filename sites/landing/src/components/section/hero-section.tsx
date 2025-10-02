@@ -67,7 +67,7 @@ const CodeBlockNode = ({ data }: { data: any }) => (
     }
 }, {
     label: "User",
-    search_fields: "email\nname\nid"
+    search_fields: "email\\nname\\nid"
 })
 .on("before_change", async ({ doc, old }) => {
     doc.password = await Bun.password.hash(doc.password as string);
@@ -176,7 +176,7 @@ const initialNodes: Node[] = [
     {
         id: 'openapi',
         type: 'feature',
-        position: { x: 1000, y: 267 },
+        position: { x: 1000, y: 251 },
         data: {
             title: 'OpenAPI Docs',
             icon: <FileText size={18} />,
@@ -186,7 +186,7 @@ const initialNodes: Node[] = [
     {
         id: 'crud',
         type: 'feature',
-        position: { x: 1000, y: 367 },
+        position: { x: 1000, y: 351 },
         data: {
             title: 'CRUD Operations',
             icon: <Layers size={18} />,
@@ -196,7 +196,7 @@ const initialNodes: Node[] = [
     {
         id: 'triggers',
         type: 'feature',
-        position: { x: 1000, y: 467 },
+        position: { x: 1000, y: 451 },
         data: {
             title: 'Event Triggers',
             icon: <Zap size={18} />,
@@ -206,7 +206,7 @@ const initialNodes: Node[] = [
     {
         id: 'database',
         type: 'feature',
-        position: { x: 1000, y: 567 },
+        position: { x: 1000, y: 551 },
         data: {
             title: 'Database Schema',
             icon: <Database size={18} />,
@@ -216,7 +216,7 @@ const initialNodes: Node[] = [
     {
         id: 'ui',
         type: 'feature',
-        position: { x: 1000, y: 667 },
+        position: { x: 1000, y: 651 },
         data: {
             title: 'Admin UI',
             icon: <Monitor size={18} />,

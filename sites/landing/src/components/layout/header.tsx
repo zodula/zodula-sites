@@ -17,10 +17,10 @@ export default function Header() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex space-x-8">
-                        <a href="#docs" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
+                        <a href="https://docs.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Documentation
                         </a>
-                        <a href="#solutions" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
+                        <a href="https://solutions.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Solutions
                         </a>
                         <a href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
@@ -44,14 +44,14 @@ export default function Header() {
                     <div className="md:hidden">
                         <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t transition-all duration-300 bg-background/95 backdrop-blur-sm border-border/50`}>
                             <a
-                                href="#docs"
+                                href="https://docs.zodula.dev"
                                 className="text-muted-foreground hover:text-foreground block px-3 py-2 text-base font-medium transition-colors duration-200"
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 Documentation
                             </a>
                             <a
-                                href="#solutions"
+                                href="https://solutions.zodula.dev"
                                 className="text-muted-foreground hover:text-foreground block px-3 py-2 text-base font-medium transition-colors duration-200"
                                 onClick={() => setIsMenuOpen(false)}
                             >

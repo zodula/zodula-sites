@@ -3,17 +3,17 @@ import { Github } from 'lucide-react';
 
 const links = {
     links: [
-        { href: '#', label: 'Solutions' },
-        { href: '#', label: 'Documentation' },
+        { href: 'https://solutions.zodula.dev', label: 'Solutions', target: '_blank' },
+        { href: 'https://docs.zodula.dev', label: 'Documentation', target: '_blank' },
     ],
     community: [
-        { href: '#', label: 'GitHub' },
+        { href: 'https://github.com/zodula/zodula', label: 'GitHub', target: '_blank' },
     ],
     legal: [
-        { href: '#', label: 'Privacy Policy' },
-        { href: '#', label: 'Terms of Service' }
+        { href: 'https://zodula.dev/privacy', label: 'Privacy Policy', target: '_blank' },
+        { href: 'https://zodula.dev/terms', label: 'Terms of Service', target: '_blank' }
     ]
-};
+} as const;
 
 export default function Footer() {
     return (
@@ -30,7 +30,7 @@ export default function Footer() {
                         </p>
                         <div className="flex space-x-4">
                             {[Github].map((Icon, i) => (
-                                <a key={i} href="#" className="text-muted-foreground hover:text-white transition-colors">
+                                <a key={i} href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-white transition-colors">
                                     <Icon className="w-5 h-5" />
                                 </a>
                             ))}
@@ -46,7 +46,7 @@ export default function Footer() {
                             <ul className="space-y-2">
                                 {section.items.map((item, j) => (
                                     <li key={j}>
-                                        <a href={item.href} className="text-muted-foreground hover:text-white transition-colors">
+                                        <a href={item.href} target={item.target} className="text-muted-foreground hover:text-white transition-colors">
                                             {item.label}
                                         </a>
                                     </li>
