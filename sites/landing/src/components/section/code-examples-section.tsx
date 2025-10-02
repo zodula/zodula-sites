@@ -43,7 +43,7 @@ const codeExamples = [
         description: "Build authentication and business logic with type-safe actions",
         language: "typescript",
         filename: "auth.ts",
-        code: `import { z } from "bxo"
+        code: `import { z } from "zodula"
 
 export const login = $action(async ctx => {
     const { email, password } = ctx.body

@@ -1,21 +1,30 @@
 {
   "name": "docs",
-  "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "private": true,
   "scripts": {
-    "check-git": "./check-git.sh",
-    "dev": "vocs dev",
-    "build": "vocs build",
-    "preview": "vocs preview"
+    "build": "next build",
+    "dev": "next dev --turbo",
+    "start": "next start",
+    "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "react": "latest",
-    "react-dom": "latest",
-    "vocs": "latest"
+    "fumadocs-core": "15.8.2",
+    "fumadocs-mdx": "^12.0.1",
+    "fumadocs-ui": "15.8.2",
+    "lucide-react": "^0.544.0",
+    "next": "15.5.4",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "typescript": "latest"
+    "@types/node": "24.5.2",
+    "@types/react": "^19.1.14",
+    "@types/react-dom": "^19.1.9",
+    "typescript": "^5.9.2",
+    "@types/mdx": "^2.0.13",
+    "@tailwindcss/postcss": "^4.1.13",
+    "tailwindcss": "^4.1.13",
+    "postcss": "^8.5.6"
   }
 }

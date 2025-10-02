@@ -1,0 +1,50 @@
+---
+title: Dev
+description: Dev
+---
+# dev
+
+Start the development server with hot reloading.
+
+## Usage
+
+```bash
+nailgun dev
+```
+
+## Description
+
+The `dev` command starts the Zodula development server with file watching enabled. This allows you to develop your application with automatic reloading when files change.
+
+## What It Does
+
+1. Prepares TSX pages for development
+2. Spawns a Bun process running the development server
+3. Enables file watching for automatic reloading
+4. Inherits stdout and stderr for real-time logging
+
+## Development Server
+
+The development server runs on the default port and provides:
+
+- **Hot Reloading**: Automatically restarts when you make changes to your code
+- **TypeScript Support**: Full TypeScript compilation and type checking
+- **Error Reporting**: Real-time error reporting in the terminal
+- **File Watching**: Monitors your project files for changes
+
+## Example
+
+```bash
+$ nailgun dev
+
+✓ Development server started
+✓ Watching for file changes...
+✓ Server running on http://localhost:3000
+```
+
+## Tips
+
+- Keep the terminal open while developing to see real-time logs
+- The server will automatically restart when you save changes
+- Check the terminal for any compilation errors or warnings
+- Use `Ctrl+C` to stop the development server

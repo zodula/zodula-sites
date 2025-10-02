@@ -1,0 +1,93 @@
+---
+title: Backup
+description: Backup
+---
+# backup
+
+Create a backup of your Zodula data files.
+
+## Usage
+
+```bash
+nailgun backup
+```
+
+## Description
+
+The `backup` command creates a timestamped backup of your `.zodula_data` directory. This is useful for preserving your database and configuration before making changes.
+
+## What It Does
+
+1. Checks for the `.zodula_data` directory
+2. Creates a `.zodula_backup` directory if it doesn't exist
+3. Creates a timestamped ZIP backup
+4. Shows backup information and size
+5. Lists existing backups
+
+## Backup Location
+
+Backups are stored in:
+```
+.zodula_backup/
+├── zodula-backup-2023-12-21T10-30-45-123Z.zip
+├── zodula-backup-2023-12-20T15-20-30-456Z.zip
+└── ...
+```
+
+## Example Output
+
+```bash
+$ nailgun backup
+
+✓ Creating backup...
+✓ Backup created successfully: zodula-backup-2023-12-21T10-30-45-123Z.zip
+📁 Location: /path/to/.zodula_backup/zodula-backup-2023-12-21T10-30-45-123Z.zip
+📊 Size: 15.23 MB
+
+📋 Existing backups (3 total):
+  1. zodula-backup-2023-12-21T10-30-45-123Z.zip (15.23 MB, 2023-12-21)
+  2. zodula-backup-2023-12-20T15-20-30-456Z.zip (12.45 MB, 2023-12-20)
+  3. zodula-backup-2023-12-19T09-15-20-789Z.zip (11.87 MB, 2023-12-19)
+```
+
+## When to Use
+
+Create backups before:
+
+- Running migrations
+- Making major changes
+- Updating Zodula
+- Deploying to production
+- Experimenting with new features
+
+## Backup Contents
+
+The backup includes:
+- Database files
+- Configuration files
+- User data
+- Application state
+- All `.zodula_data` contents
+
+## Important Notes
+
+- Backups are created as ZIP files
+- Each backup is timestamped
+- Existing backup files are excluded from new backups
+- The command will exit after completion
+
+## Tips
+
+- Create regular backups before major changes
+- Store backups in a safe location
+- Test backup restoration periodically
+- Consider automated backup schedules
+- Keep multiple backup versions
+
+## Troubleshooting
+
+If backup fails:
+- Check disk space availability
+- Ensure write permissions to the directory
+- Verify the `.zodula_data` directory exists
+- Check for any file locks

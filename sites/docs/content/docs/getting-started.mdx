@@ -1,0 +1,63 @@
+---
+title: Getting Started
+description: Let's get started
+---
+## Requirements
+
+Before you begin, make sure you have:
+
+- **Bun v1.2.x+** - [Install Bun](https://bun.sh/docs/installation)
+- **Nailgun CLI** - [Install Nailgun](https://github.com/zodula/nailgun)
+
+## Installation
+
+Create a new Zodula application:
+
+```bash
+nailgun create my-app --branch v0
+```
+
+This will create a new project with the latest v0 branch of Zodula.
+
+## Development Server
+
+Start the development server:
+
+```bash
+cd my-app
+
+nailgun dev
+```
+
+The server will start at `http://localhost:3000` with:
+
+- **OpenAPI JSON**: `GET /openapi.json`
+- **API Reference UI**: `GET /openapi`
+
+## Key Commands
+
+Zodula exposes commands through `nailgun`. Here are the most common ones:
+
+```bash
+# Prepare workspace (generate types)
+nailgun prepare
+
+# Generate migrations (diff DocTypes vs DB)
+nailgun generate
+
+# Apply migrations, push schema, and load fixtures
+nailgun migrate
+
+# Create admin user
+nailgun admin create-user --email me@example.com --password secret --roles "System Admin"
+```
+
+## Next Steps
+
+- Learn about [DocTypes](/core/doctypes) - the core building blocks
+
+## Important Notice
+
+**Version 0 is currently in experimental development.** This version undergoes rapid changes and may include breaking changes between releases. Database migrations may result in data loss during schema updates.
+
+**This version is not recommended for production environments.** Please use only in development projects where data can be easily restored or recreated.

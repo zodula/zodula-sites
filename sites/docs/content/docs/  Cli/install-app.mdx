@@ -1,0 +1,129 @@
+---
+title: Install App
+description: Install App
+---
+# install-app
+
+Install an app from a GitHub repository.
+
+## Usage
+
+```bash
+nailgun install-app <app> [options]
+```
+
+## Arguments
+
+- `<app>` - The app to install in format `@username/appname`
+
+## Options
+
+- `-b, --branch <branch>` - The branch to install (default: "master")
+- `-f, --force` - Force install even if the app already exists
+
+## Description
+
+The `install-app` command clones and installs a Zodula app from a GitHub repository. It handles dependency installation and setup automatically.
+
+## App Format
+
+The app argument must be in the format `@username/appname`:
+
+```bash
+nailgun install-app @myusername/my-awesome-app
+```
+
+## Examples
+
+### Basic Installation
+
+```bash
+nailgun install-app @myusername/my-awesome-app
+```
+
+### Install from Specific Branch
+
+```bash
+nailgun install-app @myusername/my-awesome-app --branch develop
+```
+
+### Force Install (Overwrite Existing)
+
+```bash
+nailgun install-app @myusername/my-awesome-app --force
+```
+
+## What It Does
+
+1. Validates the app format and requirements
+2. Fetches the remote package.json to get app details
+3. Checks if the app already exists (unless `--force` is used)
+4. Clones the repository to the `apps/` directory
+5. Installs dependencies with `bun install`
+6. Sets up the app in your project
+
+## Installation Process
+
+```bash
+$ nailgun install-app @myusername/my-awesome-app
+
+✓ Fetching package.json from https://raw.githubusercontent.com/myusername/my-awesome-app/refs/heads/master/package.json
+✓ Cloning repository...
+✓ Installing dependencies...
+✓ App installed successfully!
+```
+
+## Force Installation
+
+When using `--force`, the command will:
+
+1. Remove the existing app directory
+2. Remove `node_modules` and `bun.lock`
+3. Clone the fresh repository
+4. Install dependencies
+
+## Requirements
+
+- The repository must be publicly accessible on GitHub
+- The repository must have a valid `package.json`
+- The app name in `package.json` must match the expected format
+- You must have Git installed and configured
+
+## When to Use
+
+Use `install-app` when:
+
+- You want to add a community app to your project
+- You're setting up a project with existing apps
+- You need to install apps from specific branches
+- You're updating an existing app installation
+
+## Tips
+
+- Always check the app's documentation before installing
+- Use specific branches for development versions
+- Test apps in development before production
+- Keep your installed apps updated
+- Use `--force` carefully as it will overwrite existing data
+
+## Troubleshooting
+
+If installation fails:
+
+1. Verify the repository exists and is accessible
+2. Check that the username starts with `@`
+3. Ensure the app name is correct
+4. Verify you have Git installed
+5. Check your internet connection
+6. Ensure you have write permissions to the project directory
+
+## Example Output
+
+```bash
+$ nailgun install-app @zodula/example-app
+
+✓ Fetching package.json from https://raw.githubusercontent.com/zodula/example-app/refs/heads/master/package.json
+✓ Cloning repository to apps/example-app...
+✓ Installing dependencies...
+✓ App example-app installed successfully!
+```

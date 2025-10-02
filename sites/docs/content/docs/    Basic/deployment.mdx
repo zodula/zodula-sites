@@ -1,0 +1,47 @@
+---
+title: Deployment
+description: This guide covers deploying Zodula applications on a bare metal Ubuntu VPS server.
+---
+## System Requirements
+
+- **Ubuntu 20.04+** - Operating system
+- **Bun v1.2.x+** - Runtime environment
+
+## Server Setup
+
+### 1. Update System
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+### 2. Install Bun
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+source ~/.bashrc
+```
+
+## Application Deployment
+
+### 1. Clone Your Application
+
+```bash
+git clone https://github.com/your-username/your-monorepo.git
+cd your-zodula-app
+```
+
+### 2. Install Dependencies
+
+```bash
+bun install
+```
+
+### 3. Start Application
+
+```bash
+ngun start
+```
+
+That's it! Your Zodula application is now running.
+

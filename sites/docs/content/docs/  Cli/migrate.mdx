@@ -1,0 +1,78 @@
+---
+title: Migrate
+description: Migrate
+---
+# migrate
+
+Apply database migrations to update your database schema.
+
+## Usage
+
+```bash
+nailgun migrate
+```
+
+## Description
+
+The `migrate` command applies all pending database migrations to update your database schema. It runs migrations, applies fixtures, and handles predefined data.
+
+## What It Does
+
+1. Starts up the Zodula server
+2. Applies all pending migrations
+3. Applies fixtures (sample data)
+4. Applies predefined data
+5. Updates the database schema
+
+## Migration Process
+
+The migration process includes:
+
+- **Schema Changes**: Updates database tables and columns
+- **Data Migrations**: Transforms existing data as needed
+- **Fixtures**: Applies sample/test data
+- **Predefined Data**: Sets up initial system data
+
+## When to Use
+
+Run `migrate` when:
+
+- After creating new doctypes
+- After modifying existing doctypes
+- After generating new migrations
+- When setting up a fresh database
+- After pulling changes that include migrations
+
+## Example
+
+```bash
+$ nailgun migrate
+
+✓ Applying migrations...
+✓ Applying fixtures...
+✓ Applying predefined data...
+✓ Migration completed successfully
+```
+
+## Important Notes
+
+- Always backup your database before running migrations in production
+- Test migrations in a development environment first
+- Some migrations may be irreversible
+- The command will exit after completion
+
+## Troubleshooting
+
+If migrations fail:
+
+1. Check the error messages in the terminal
+2. Ensure your database is accessible
+3. Verify migration files are valid
+4. Consider restoring from backup if needed
+
+## Tips
+
+- Run `nailgun generate` before `migrate` to create new migrations
+- Use `nailgun backup` before major migrations
+- Test migrations in development first
+- Keep your database backups up to date
