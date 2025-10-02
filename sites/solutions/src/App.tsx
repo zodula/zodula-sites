@@ -30,7 +30,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="dark relative text-foreground min-h-screen bg-background max-md:px-4 max-md:pt-10">
+    <div className="dark relative text-foreground min-h-screen bg-background">
       <LightRays />
       <div className="relative min-h-[calc(100vh)] flex flex-col items-center justify-center">
         <div className="flex flex-col items-center justify-center gap-4">
