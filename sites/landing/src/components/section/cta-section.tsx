@@ -11,7 +11,7 @@ export default function CtaSection() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12">
-                    <a href="/docs" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-1 rounded-md transition-colors flex items-center justify-center">
+                    <a href="/docs" className="bg-primary hover:bg-primary/90 text-foreground px-6 py-1 rounded-md transition-colors flex items-center justify-center">
                         <Zap className="w-4 h-4 mr-2" />
                         See the Docs
                         <ArrowRight className="w-4 h-4 ml-2" />

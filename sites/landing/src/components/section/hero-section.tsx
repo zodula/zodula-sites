@@ -7,40 +7,35 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import '@xyflow/react/dist/style.css';
 
 const labelStyle = {
-    fill: '#f97316',
+    fill: 'var(--primary)',
     fontWeight: 400,
     fontSize: 10,
 };
 
 const edgeStyle = {
-    stroke: '#f97316',
+    stroke: 'var(--primary)',
     strokeWidth: 2,
 };
 
 const selectedEdgeStyle = {
-    stroke: '#f97316',
+    stroke: 'var(--primary)',
     strokeWidth: 4,
-};
-
-const hoveredEdgeStyle = {
-    stroke: '#fb923c',
-    strokeWidth: 3,
 };
 
 // Custom Node Components
 const CodeBlockNode = ({ data }: { data: any }) => (
-    <div className="bg-black/90 backdrop-blur-xl text-orange-300 p-6 rounded-xl border border-orange-500/30 min-w-[450px] font-mono text-sm shadow-2xl">
+    <div className="bg-black/90 backdrop-blur-xl text-primary p-6 rounded-xl border border-primary/30 min-w-[450px] font-mono text-sm shadow-2xl">
         {/* All-directional handles - always present but only visible when editing */}
-        <Handle type="source" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="source" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="source" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="source" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Top} id="top" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Right} id="right" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="source" position={Position.Left} id="left" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
 
         <div className="flex items-center gap-2 mb-4">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-orange-400 ml-4">User.doctype.ts</span>
+            <span className="text-primary ml-4">User.doctype.ts</span>
         </div>
         <div className="text-xs">
             <SyntaxHighlighter
@@ -93,18 +88,18 @@ const CodeBlockNode = ({ data }: { data: any }) => (
 );
 
 const FeatureNode = ({ data }: { data: any }) => (
-    <div className="bg-black/80 backdrop-blur-xl border border-orange-500/20 rounded-xl p-4 min-w-[200px] shadow-xl hover:bg-black/90 transition-all duration-300 group">
+    <div className="bg-black/80 backdrop-blur-xl border border-primary/30 rounded-xl p-4 min-w-[200px] shadow-xl hover:bg-black/90 transition-all duration-300 group">
         {/* All-directional handles - always present but only visible when editing */}
-        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
 
         <div className="flex items-center gap-3 mb-2">
             <div className={`w-8 h-8 ${data.iconBg} rounded-lg flex items-center justify-center text-white`}>
                 {data.icon}
             </div>
-            <div className="text-white text-sm">{data.title}</div>
+            <div className="text-foreground text-sm">{data.title}</div>
         </div>
     </div>
 );
@@ -114,7 +109,7 @@ const TaglineNode = ({ data }: { data: { title: string; subtitle: string; descri
         <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 text-4xl font-bold">
                 <span>{data.title}</span>
-                <span className="text-orange-400">{data.subtitle}</span>
+                <span className="text-primary">{data.subtitle}</span>
             </div>
             <span className="text-muted-foreground text-xl">{data.description}</span>
         </div>
@@ -122,20 +117,19 @@ const TaglineNode = ({ data }: { data: { title: string; subtitle: string; descri
 );
 
 const CommandNode = ({ data }: { data: { command: string; isCopied: boolean; onCopy: () => void; isEditing: boolean } }) => (
-    <div className="bg-black/80 backdrop-blur-xl border border-orange-500/20 rounded-lg p-4 flex items-center justify-center relative gap-6 z-30 pointer-events-auto">
+    <div className="bg-black/80 backdrop-blur-xl border border-primary/30 rounded-lg p-4 flex items-center justify-center relative gap-6 z-30 pointer-events-auto">
         {/* All-directional handles - always present but only visible when editing */}
-        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
-        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-orange-500 ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Top} id="top" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Right} id="right" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Bottom} id="bottom" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
+        <Handle type="target" position={Position.Left} id="left" className={`w-3 h-3 bg-primary ${!data.isEditing ? 'opacity-0' : ''}`} />
 
         <div className="flex items-center gap-2">
             <span className="text-white font-mono text-sm"><TypingAnimation speed={50} text={data.command} /></span>
         </div>
         <button
-            className="p-3 hover:bg-orange-500/20 rounded-md transition-all duration-200 flex items-center justify-center text-orange-400 hover:text-orange-300 relative z-50 pointer-events-auto border border-orange-500/30 hover:border-orange-500/50"
+            className="p-3 hover:bg-primary/20 rounded-md transition-all duration-200 flex items-center justify-center text-primary hover:text-primary-foreground relative z-50 pointer-events-auto border border-primary/30 hover:border-primary/50"
             onClick={e => {
-                console.log('Copy button clicked!');
                 e.preventDefault();
                 e.stopPropagation();
                 data.onCopy();
@@ -169,53 +163,6 @@ const nodeTypes = {
     feature: FeatureNode,
     tagline: TaglineNode,
     command: CommandNode,
-};
-
-// Context Menu Component
-const ContextMenu = ({
-    x,
-    y,
-    onClose,
-    onDeleteEdge,
-    edgeId
-}: {
-    x: number;
-    y: number;
-    onClose: () => void;
-    onDeleteEdge: (edgeId: string) => void;
-    edgeId: string;
-}) => {
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as HTMLElement)) {
-                onClose();
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [onClose]);
-
-    return (
-        <div
-            ref={menuRef}
-            className="fixed bg-black/90 backdrop-blur-xl border border-orange-500/30 rounded-lg p-2 shadow-2xl z-50"
-            style={{ left: x, top: y }}
-        >
-            <button
-                onClick={() => {
-                    onDeleteEdge(edgeId);
-                    onClose();
-                }}
-                className="flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/20 rounded text-sm transition-colors w-full text-left"
-            >
-                <Trash2 size={16} />
-                Delete Connection
-            </button>
-        </div>
-    );
 };
 
 // Component to handle resize and fit view
