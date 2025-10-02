@@ -19,7 +19,7 @@ export function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIsVisible(false);
-      
+
       setTimeout(() => {
         setCurrentSolutionIndex((prev) => (prev + 1) % solutions.length);
         setIsVisible(true);
@@ -38,10 +38,9 @@ export function App() {
           <div className="flex gap-2 items-center whitespace-nowrap">
             <span>The only solution you need for </span>
             <span className="relative inline-block min-w-[110px] text-center">
-              <span 
-                className={`transition-opacity duration-500 ${
-                  isVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+              <span
+                className={`transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'
+                  }`}
               >
                 {solutions[currentSolutionIndex]}
               </span>
@@ -62,6 +61,10 @@ export function App() {
         <div className="flex justify-center gap-2 text-sm font-mono">
           <a href="mailto:solutions@zodula.dev" target="_blank" className="hover:underline">
             solutions@zodula.dev
+          </a>
+          or
+          <a href="https://zodula.dev/" target="_blank" className="hover:underline">
+            Framework
           </a>
         </div>
       </div>
