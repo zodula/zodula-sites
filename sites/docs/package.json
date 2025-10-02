@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "check-git": "./check-git.sh",
     "dev": "vocs dev",
     "build": "vocs build",
     "preview": "vocs preview"
