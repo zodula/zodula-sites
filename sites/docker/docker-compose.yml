@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  zodula:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - zodula_data:/app/.zodula
+      - zodula_backup:/app/.zodula_backup
+      - zodula_config:/app/.zodula_data
+    environment:
+      - BRANCH=${BRANCH:-main}
+      - APP_NAME=${APP_NAME:-my-app}
+      - APPS=${APPS:-}
+    command: ["--branch", "${BRANCH:-main}", "--app-name", "${APP_NAME:-my-app}", "--apps", "${APPS:-}"]
+
+volumes:
+  zodula_data:
+  zodula_backup:
+  zodula_config:
