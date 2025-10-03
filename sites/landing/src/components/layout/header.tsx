@@ -24,7 +24,7 @@ export default function Header() {
                         <a href="https://solutions.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Solutions
                         </a>
-                        <a href="https://docs.zodula.dev" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
+                        <a href="https://docs.zodula.dev/docs" target="_blank" className="text-muted-foreground hover:text-foreground px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Documentation
                         </a>
                         <a href="https://github.com/zodula/zodula" target="_blank" className="text-muted-foreground hover:text-foreground p-2 text-sm font-medium transition-colors duration-200">
@@ -48,7 +48,7 @@ export default function Header() {
                     <div className="md:hidden">
                         <div className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t transition-all duration-300 bg-background/95 backdrop-blur-sm border-border/50`}>
                             <a
-                                href="https://docs.zodula.dev"
+                                href="https://docs.zodula.dev/docs"
                                 className="text-muted-foreground hover:text-foreground block px-3 py-2 text-base font-medium transition-colors duration-200"
                                 onClick={() => setIsMenuOpen(false)}
                             >
