@@ -1,0 +1,266 @@
+---
+title: Create Doctype
+description: Learn how to create new document types (doctypes) in your Zodula project using the scaffold command. Doctypes define the structure and behavior of your data models.
+---
+
+## Quick Start
+
+Create a new document type within an existing app:
+
+```bash
+nailgun scaffold doctype
+```
+
+Or run the general scaffold command and select "Doctype" from the menu:
+
+```bash
+nailgun scaffold
+```
+
+## Prerequisites
+
+Before creating a doctype, you need to have at least one app in your project. If you don't have an app yet, create one first:
+
+```bash
+nailgun scaffold app
+```
+
+## Interactive Setup
+
+The scaffold command will prompt you for the following information:
+
+### 1. Select App
+Choose from your existing apps where you want to create the doctype.
+
+### 2. Doctype Name
+- Must start with an uppercase letter
+- Use PascalCase naming convention
+- Examples: `Customer`, `Product`, `Order`, `UserProfile`
+
+### 3. Domain
+- Folder name for organizing doctypes (default: "core")
+- Examples: `core`, `sales`, `inventory`, `users`
+- This creates a folder structure: `doctype/domain/`
+
+### 4. Label
+- Display name for the doctype (defaults to doctype name)
+- Used in the UI and documentation
+- Examples: "Customer Information", "Product Catalog"
+
+### 5. Is Submittable
+- Whether this doctype can be submitted (default: false)
+- Submittable doctypes can be submitted for approval workflows
+- Choose `true` for documents that need approval, `false` for simple data records
+
+## Generated Structure
+
+When you scaffold a doctype, it creates the following file:
+
+```
+apps/your-app-name/doctype/domain/DoctypeName.ts
+```
+
+## Generated Doctype Template
+
+The scaffold creates a basic doctype with a `name` field and proper configuration:
+
+```typescript
+export default $doctype<"app__DoctypeName">({
+    name: {
+        type: "Text",
+        label: "Name",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    // Add more fields as needed
+}, {
+    label: "Doctype Name",
+    is_submittable: 0,
+    search_fields: "name"
+})
+```
+
+### Template Breakdown
+
+**Field Definition:**
+- `name`: A required, unique text field that appears in list views
+- `type: "Text"`: Specifies the field type
+- `required: 1`: Makes the field mandatory
+- `unique: 1`: Ensures no duplicate values
+- `in_list_view: 1`: Shows the field in list/grid views
+
+**Doctype Configuration:**
+- `label`: Human-readable name for the doctype
+- `is_submittable`: Whether the doctype supports submission workflows
+- `search_fields`: Fields that are indexed for search functionality
+
+## Example
+
+```bash
+$ nailgun scaffold doctype
+
+? Select app: my-awesome-app
+? Doctype name: Customer
+? Domain: core
+? Label: Customer Information
+? Is submittable: No
+
+✓ Doctype Customer created successfully!
+Location: apps/my-awesome-app/doctype/core/Customer.ts
+Next steps:
+1. Add fields to your doctype
+2. Run 'nailgun generate' to create migrations
+3. Run 'nailgun dev' to start development
+```
+
+## Adding Fields
+
+After creating a doctype, you can add more fields to define your data structure:
+
+```typescript
+export default $doctype<"app__Customer">({
+    name: {
+        type: "Text",
+        label: "Customer Name",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    email: {
+        type: "Data",
+        label: "Email Address",
+        required: 1,
+        unique: 1,
+        in_list_view: 1
+    },
+    phone: {
+        type: "Data",
+        label: "Phone Number",
+        required: 0
+    },
+    address: {
+        type: "Text",
+        label: "Address",
+        required: 0
+    },
+    created_date: {
+        type: "Datetime",
+        label: "Created Date",
+        default: "now",
+        read_only: 1
+    }
+}, {
+    label: "Customer Information",
+    is_submittable: 0,
+    search_fields: "name,email"
+})
+```
+
+## Field Types
+
+Zodula supports various field types for different data needs:
+
+- **Text**: Multi-line text content
+- **Data**: Single-line text (emails, phone numbers, etc.)
+- **Int**: Integer numbers
+- **Float**: Decimal numbers
+- **Currency**: Monetary values
+- **Percent**: Percentage values
+- **Check**: Boolean true/false
+- **Select**: Dropdown selection
+- **Date**: Date only
+- **Datetime**: Date and time
+- **Time**: Time only
+- **Link**: Reference to another doctype
+- **Table**: Child table with multiple rows
+- **Attach**: File attachments
+- **Attach Image**: Image files only
+
+## Next Steps
+
+After creating your doctype:
+
+1. **Add Fields**: Define the structure of your data by adding appropriate fields
+2. **Generate Migrations**: Run `nailgun generate` to create database migrations
+3. **Test**: Use `nailgun dev` to start development and test your doctype
+4. **Create Records**: Use the admin interface or API to create and manage records
+
+## Best Practices
+
+- **Naming**: Use descriptive, PascalCase names for doctypes
+- **Organization**: Group related doctypes in the same domain folder
+- **Fields**: Start with essential fields and add more as needed
+- **Validation**: Use `required` and `unique` constraints appropriately
+- **Search**: Include important fields in `search_fields` for better discoverability
+- **Performance**: Consider indexing frequently queried fields
+
+## Common Patterns
+
+### Master-Detail Pattern
+```typescript
+// Master doctype
+export default $doctype<"app__SalesOrder">({
+    customer: {
+        type: "Link",
+        label: "Customer",
+        options: "Customer",
+        required: 1
+    },
+    order_date: {
+        type: "Date",
+        label: "Order Date",
+        required: 1
+    }
+    // ... other fields
+})
+
+// Detail doctype
+export default $doctype<"app__SalesOrderItem">({
+    parent: {
+        type: "Link",
+        label: "Sales Order",
+        options: "Sales Order",
+        required: 1
+    },
+    item: {
+        type: "Link",
+        label: "Item",
+        options: "Item",
+        required: 1
+    },
+    quantity: {
+        type: "Float",
+        label: "Quantity",
+        required: 1
+    }
+    // ... other fields
+})
+```
+
+### Status-Based Workflow
+```typescript
+export default $doctype<"app__Task">({
+    title: {
+        type: "Text",
+        label: "Title",
+        required: 1
+    },
+    status: {
+        type: "Select",
+        label: "Status",
+        options: "Draft\nIn Progress\nCompleted\nCancelled",
+        default: "Draft",
+        required: 1
+    },
+    assigned_to: {
+        type: "Link",
+        label: "Assigned To",
+        options: "User"
+    }
+}, {
+    label: "Task",
+    is_submittable: 1,
+    search_fields: "title,status"
+})
+```
